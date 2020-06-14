@@ -1,14 +1,11 @@
 {
-  "name": "dino_app",
+  "name": "client_app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
     "@testing-library/user-event": "^7.1.2",
-    "@types/fabric": "^3.6.2",
-    "fabric": "^4.0.0-beta.7",
-    "fabric-brush": "0.0.1",
     "node-sass": "^4.13.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
