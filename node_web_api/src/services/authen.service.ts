@@ -8,16 +8,16 @@ class AuthenService {
     public account = AccountModel;
 
     public async login(req: any) {
-        let acc = await this.account.findOne({ account_name: req.account_name });
+        let acc = await this.account.findOne({ email: req.email });
         if (!acc) {
-            throw new HttpException(500, `Account ${req.account_name} is not exist.`);
+            throw new HttpException(500, `Email ${req.email} is not exist.`);
         }
         else {
             const isPasswordMatching = await bcrypt.compare(req.password, acc.password);
             if (!isPasswordMatching)
                 throw new HttpException(500, `Password is not correct.`);
             if (acc.lock)
-                throw new HttpException(500, `Account ${req.account_name} is lock.`);
+                throw new HttpException(500, `Email ${req.email} is lock.`);
             acc.password = null;
             return acc;
         }

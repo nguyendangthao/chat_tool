@@ -7,12 +7,12 @@ import { AccountCreateVal, AccountUpdateVal } from "../validates/account.validat
 import PaginatedResult from "../helper/paginatedResult";
 import authMiddleware from "../middlewares/auth.middleware";
 import { SendEmailHelper } from "../helper/sendEmailHelper";
-import { Email_Change_Password_Context } from "../utils/constans";
+import { Email_Recovey_Password, Email_Create_Account } from "../utils/constans";
 import * as mongoose from 'mongoose';
 import * as multer from "multer";
 import * as formidable from 'formidable';
 let fs = require('fs');
-
+import { tempEmailCreateNewAcc, tempEmailReCoveryPass } from '../utils/temeplateEmail';
 const upload = multer({
     dest: 'uploads/',
     fileFilter: (req, file, cb) => {
@@ -50,7 +50,7 @@ class AccountController implements Controller {
     private initializeRoutes() {
         this.router
             .post(this.path + '/getAll', authMiddleware, this.getAll)
-            .post(this.path + '/create', authMiddleware, validationMiddleware(AccountCreateVal), this.create)
+            .post(this.path + '/create', validationMiddleware(AccountCreateVal), this.create)
             .post(this.path + '/update', authMiddleware, validationMiddleware(AccountUpdateVal), this.update)
             .post(this.path + '/changePassword', this.changePassword)
             .post(this.path + '/find', authMiddleware, this.find)
@@ -73,6 +73,10 @@ class AccountController implements Controller {
     private create = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
             let result = await this.accountService.create(request.body);
+            if (result) {
+                const temp = tempEmailCreateNewAcc(request.body);
+                SendEmailHelper(request.body.email, Email_Create_Account, '', temp);
+            }
             response.send({
                 status: result,
             });
@@ -98,7 +102,7 @@ class AccountController implements Controller {
         try {
             let email = await this.accountService.changePassword(request.body);
             if (email) {
-                await SendEmailHelper(email, 'Change PassWord', Email_Change_Password_Context, ``);
+                await SendEmailHelper(email, 'Change PassWord', Email_Recovey_Password, ``);
             }
             response.send({
                 status: true,
@@ -121,10 +125,18 @@ class AccountController implements Controller {
         response.send(data);
     }
     private forgetPassword = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        let data = await this.accountService.forgetPassword(request.body);
-        response.send({
-            status: data,
-        });
+        try {
+            let data = await this.accountService.forgetPassword(request.body);
+            if (data) {
+                const temp = tempEmailReCoveryPass(request.body);
+                SendEmailHelper(request.body.email, Email_Recovey_Password, '', temp);
+            }
+            response.send({
+                status: data,
+            });
+        } catch (er) {
+            return next(er);
+        }
     }
     private uploadAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {

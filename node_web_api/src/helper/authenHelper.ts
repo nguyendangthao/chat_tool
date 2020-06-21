@@ -6,7 +6,7 @@ export default class AuthenHelper {
 
     createToken(account: AccountInterface) {
         //  const expiresIn = 3 * 60 * 60; // 3 hours
-        const expiresIn = 2 * 60; // 2'
+        const expiresIn = 4 * 60 * 60; 
         const secret = process.env.JWT_SECRET;
         const dataStoredInToken: DataStoredInToken = {
             _id: account._id,

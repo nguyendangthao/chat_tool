@@ -239,3 +239,7 @@
   background: #555;
 }
 /*and custom scroll bar */
+
+.error {
+  color: red;
+}

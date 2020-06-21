@@ -28,27 +28,27 @@ class AccountService {
                 scope_access: req.scope_access,
                 roles: req.roles,
                 password: hashedPassword,
-                personal: {
-                    full_name: person.full_name,
-                    description: person.description,
-                    birth_day: person.birth_day,
-                    avatar: person.avatar,
+                // personal: {
+                //     full_name: person.full_name,
+                //     description: person.description,
+                //     birth_day: person.birth_day,
+                //     avatar: person.avatar,
 
-                },
-                organization: {
-                    o_code: organi.o_code,
-                    o_name: organi.o_name,
-                    o_tax_code: organi.o_tax_code,
-                    o_address: organi.o_address,
-                    o_email: organi.o_email,
-                    o_phone_number: organi.o_phone_number,
-                    bank_information: {
-                        bank_name: organi.bank_information.bank_name,
-                        account_holder: organi.bank_information.account_holder,
-                        accout_number: organi.bank_information.accout_number,
-                        branch_bank: organi.bank_information.branch_bank,
-                    }
-                }
+                // },
+                // organization: {
+                //     o_code: organi.o_code,
+                //     o_name: organi.o_name,
+                //     o_tax_code: organi.o_tax_code,
+                //     o_address: organi.o_address,
+                //     o_email: organi.o_email,
+                //     o_phone_number: organi.o_phone_number,
+                //     bank_information: {
+                //         bank_name: organi.bank_information.bank_name,
+                //         account_holder: organi.bank_information.account_holder,
+                //         accout_number: organi.bank_information.accout_number,
+                //         branch_bank: organi.bank_information.branch_bank,
+                //     }
+                // }
 
             }
         );
@@ -151,14 +151,14 @@ class AccountService {
     }
     public async forgetPassword(req: any) {
         let acount: any = await this.account.findOne({
-            account_name: req.account_name
+            email: req.email
         });
         if (!acount) {
-            throw new HttpException(500, `Account ${req.account_name} is not exist.`);
+            throw new HttpException(500, `Email ${req.email} is not exist.`);
         }
-        const hashedNewPassword = await bcrypt.hash(req.new_password, 10);
+        const hashedNewPassword = await bcrypt.hash(req.password, 10);
         const result = await this.account.updateOne({
-            account_name: req.account_name
+            email: req.email
         },
             {
                 password: hashedNewPassword

@@ -11,11 +11,16 @@ const AccountSchema = new mongoose.Schema({
     status: { type: String, uppercase: true, trim: true },
     created_id: { type: mongoose.Schema.Types.ObjectId },
     scope_access: { type: String, uppercase: true, trim: true },
-    roles: [
-        { type: mongoose.Schema.Types.ObjectId }
+    channels: [
+        {
+            channel_id: { type: mongoose.Schema.Types.ObjectId },
+            channel_name: { type: String, },
+        }
+
     ],
     created_at: { type: Date, default: new Date() },
     updated_at: { type: Date, default: new Date() },
+    isOnline: { type: Boolean, default: false },
     // had better research model again
     personal: {
         full_name: { type: String, trim: true },

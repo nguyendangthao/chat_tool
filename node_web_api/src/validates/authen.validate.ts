@@ -2,9 +2,9 @@ import { IsString, IsDefined } from 'class-validator';
 
 export class LogInVal {
   @IsDefined({
-    message: "Account is required"
+    message: "Email is required"
   })
-  public account_name: string;
+  public email: string;
 
   @IsDefined({
     message: "Password is required"

@@ -1,4 +1,4 @@
 {
-    "basedUrl": "http://localhost:6886/",
+    "basedUrl": "http://127.10.0.1:3333/api/v1/",
     "port":0
 }
