@@ -129,18 +129,6 @@ class Login extends Component {
         );
     }
 }
-function mapStateToProps(state) {
-    return {
-        colorSelect: state.drawReduct.colorSelect,
-    };
-}
-const mapPropsToDispatch = dispatch => ({
-    changeColorDispatch: (action, data) => {
-        return dispatch({
-            type: action,
-            colorSelect: data
-        });
-    },
-});
 
-export default connect(mapStateToProps, mapPropsToDispatch)(Login);
+
+export default connect(null, null)(Login);

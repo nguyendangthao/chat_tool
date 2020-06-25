@@ -6,6 +6,14 @@ export interface AccountInterface {
     email: string;
     phone_number: number;
     scope_access: boolean;
+    channels: [
+        {
+            channel_id: string,
+            channel_name: string
+        }
+
+    ],
+    isOnline: boolean,
     lock: boolean;
     status: string;
     roles: string[];

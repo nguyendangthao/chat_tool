@@ -112,6 +112,26 @@
   right: 0.4em;
   border: 1.5px solid white;
 }
+.busy_icon {
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  background-color: red;
+  border-radius: 50%;
+  bottom: 0.2em;
+  right: 0.4em;
+  border: 1.5px solid white;
+}
+.away_icon {
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  background-color: orange;
+  border-radius: 50%;
+  bottom: 0.2em;
+  right: 0.4em;
+  border: 1.5px solid white;
+}
 .offline {
   background-color: #c23616 !important;
 }
@@ -242,4 +262,11 @@
 
 .error {
   color: red;
+}
+.contact_Li {
+  cursor: pointer;
+}
+
+.contacts_header {
+  padding-left: 0.7rem;
 }

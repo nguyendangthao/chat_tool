@@ -23,7 +23,8 @@ const ChannelSchema = new mongoose.Schema({
     admin: {
         user_id: { type: mongoose.Types.ObjectId },
         user_name: { type: String, },
-    }
+    },
+    isGroup: { type: Boolean, default: false },
 
 }, { versionKey: false });
 

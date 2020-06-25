@@ -18,7 +18,14 @@ class AuthenService {
                 throw new HttpException(500, `Password is not correct.`);
             if (acc.lock)
                 throw new HttpException(500, `Email ${req.email} is lock.`);
+            await this.account.updateOne({
+                _id: acc._id
+            },
+                {
+                    isOnline: true
+                });
             acc.password = null;
+            acc.isOnline = true
             return acc;
         }
 

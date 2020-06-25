@@ -5,7 +5,9 @@ import * as express from 'express';
 import * as mongoose from 'mongoose';
 import Controller from './interfaces/controller.interface';
 import errorMiddleware from './middlewares/error.middleware';
-
+import ChatSocket from './sockets/chat.socket';
+import * as socket from 'socket.io';
+import * as http from 'http';
 class App {
   public app: express.Application;
 
@@ -16,6 +18,7 @@ class App {
     this.initializeMiddlewares();
     this.initializeControllers(controllers);
     this.initializeErrorHandling();
+    this.initializeSocket();
   }
 
   public initCORS() {
@@ -66,6 +69,12 @@ class App {
       MONGO_PATH,
     } = process.env;
     mongoose.connect(MONGO_PATH + DATABASE, { useNewUrlParser: true, autoIndex: false, useUnifiedTopology: true });
+  }
+  private initializeSocket() {
+    // Init server with socket.io and express app
+    const server = http.createServer(this.app);
+    const io =  socket(server, { path: "/chat/socket.io" });
+    new ChatSocket(io);
   }
 }
 

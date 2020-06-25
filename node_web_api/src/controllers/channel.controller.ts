@@ -2,7 +2,7 @@ import Controller from "interfaces/controller.interface";
 import * as express from 'express';
 import validationMiddleware from "../middlewares/validation.middleware";
 import HttpException from "../exceptions/httpException";
-import AccountService from "../services/account.service";
+import ChannelService from "../services/channel.service";
 import { AccountCreateVal, AccountUpdateVal } from "../validates/account.validate";
 import PaginatedResult from "../helper/paginatedResult";
 import authMiddleware from "../middlewares/auth.middleware";
@@ -37,11 +37,11 @@ const upload = multer({
     })
 });
 
-class AccountController implements Controller {
+class ChannelController implements Controller {
 
     public router = express.Router();
-    public path = '/account';
-    public accountService = new AccountService();
+    public path = '/channel';
+    public channelService = new ChannelService();
     public objectId = mongoose.Types.ObjectId;
     constructor() {
         this.initializeRoutes();
@@ -50,7 +50,7 @@ class AccountController implements Controller {
     private initializeRoutes() {
         this.router
             .post(this.path + '/getAll', authMiddleware, this.getAll)
-            .post(this.path + '/create', validationMiddleware(AccountCreateVal), this.create)
+            .post(this.path + '/create', authMiddleware, this.create)
             .post(this.path + '/update', authMiddleware, validationMiddleware(AccountUpdateVal), this.update)
             .post(this.path + '/changePassword', this.changePassword)
             .post(this.path + '/find', authMiddleware, this.find)
@@ -59,12 +59,13 @@ class AccountController implements Controller {
             .get(this.path + '/getAvatar' + '/:avatar', this.getAvatar)
             .post(this.path + '/uploadMulti', upload.array('avatar', 3), this.uploadMulti)
             .post(this.path + '/uploadFormidable', this.uploadFormidable)
+
             .get(this.path + '/detail' + '/:_id', this.detail)
-       
+            .post(this.path + '/getChannels', authMiddleware, this.getChannels)
     }
     private getAll = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
 
-        let data = await this.accountService.getAll();
+        let data = await this.channelService.getAll();
         if (!data) {
             next(new HttpException(500, 'error'));
             return false;
@@ -73,7 +74,7 @@ class AccountController implements Controller {
     }
     private create = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
-            let result = await this.accountService.create(request.body);
+            let result = await this.channelService.create(request.body);
             if (result) {
                 const temp = tempEmailCreateNewAcc(request.body);
                 SendEmailHelper(request.body.email, Email_Create_Account, '', temp);
@@ -89,7 +90,7 @@ class AccountController implements Controller {
     }
     private update = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
-            let result = await this.accountService.update(request.body);
+            let result = await this.channelService.update(request.body);
             response.send({
                 status: result,
             });
@@ -101,7 +102,7 @@ class AccountController implements Controller {
     }
     private changePassword = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
-            let email = await this.accountService.changePassword(request.body);
+            let email = await this.channelService.changePassword(request.body);
             if (email) {
                 await SendEmailHelper(email, 'Change PassWord', Email_Recovey_Password, ``);
             }
@@ -115,8 +116,9 @@ class AccountController implements Controller {
     }
     private find = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
 
-        let data = await this.accountService.find(request.body);
+        let data = await this.channelService.find(request.body);
         if (!data) {
+            // next(new UserDataIsNotExist());
             return false;
         }
         // response.send({
@@ -126,7 +128,7 @@ class AccountController implements Controller {
     }
     private forgetPassword = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
-            let data = await this.accountService.forgetPassword(request.body);
+            let data = await this.channelService.forgetPassword(request.body);
             if (data) {
                 const temp = tempEmailReCoveryPass(request.body);
                 SendEmailHelper(request.body.email, Email_Recovey_Password, '', temp);
@@ -150,7 +152,7 @@ class AccountController implements Controller {
                 _id: request.body._id,
                 avatar: request.file.filename
             }
-            const result = await this.accountService.uploadAvatar(objAccount);
+            const result = await this.channelService.uploadAvatar(objAccount);
             if (!result) {
                 next(new HttpException(500, 'Fall'));
             }
@@ -195,34 +197,25 @@ class AccountController implements Controller {
         }
     }
     private detail = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        const _id = request.params._id;
-        if (!this.objectId.isValid(_id)) {
-            next(new HttpException(400, `Id is invalid`));
+        try {
+            const _id = request.params._id;
+            if (!this.objectId.isValid(_id)) {
+                next(new HttpException(400, `Id is invalid`));
+            }
+            let result = await this.channelService.detail(_id);
+            return response.send(result);
+        } catch (er) {
+            return next(er);
         }
 
-        let result = await this.accountService.detail(_id);
-        // let finalResult: any = {
-        //     updated_at: result.updated_at,
-        //     account_name: result.account_name,
-        //     password: result.password,
-        //     lock: result.lock,
-        //     status: result.status,
-        //     email: result.email,
-        //     personal: result.personal,
-        //     phone_number: result.phone_number,
-        //     scope_access: result.scope_access,
-        //     created_at: result.created_at,
-        //     roles: result.roles
-        // }
-        // for (let i = 0; i < result.roles.length; i++) {
-        //     finalResult.roles.push({
-        //         _id: result.roles[i]._id,
-        //         name: result.roles[i].name
-        //     });
-        // }
-        return response.send(result);
     }
-
-   
+    private getChannels = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        try {
+            let data = await this.channelService.getChannels(request.body)
+            return response.send(data);
+        } catch (er) {
+            return next(er);
+        }
+    }
 }
-export default AccountController;
+export default ChannelController;

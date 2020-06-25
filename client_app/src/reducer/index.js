@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
-import drawReduct from './drawReduct';
+import changeContactReduct from './changeContactReduct';
 
 const rootReducer = combineReducers({
-    drawReduct
+    changeContactReduct
 });
 export default rootReducer;
