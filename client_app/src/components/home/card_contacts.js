@@ -4,7 +4,7 @@ import Storage from '../../helpers/storage';
 import { connect } from 'react-redux';
 import { CHANGE_CONTACT } from '../../constants/actionReduct';
 import CardPersonal from './card_personal';
-
+import ActionChatSocket from "../../helpers/action_chat_socket";
 class CardContacts extends Component {
 
     constructor(props) {
@@ -26,7 +26,6 @@ class CardContacts extends Component {
                 this.setState({ accouts: res.data, contactId: res.data[0]._id });
                 this.props.changContactDispatch(CHANGE_CONTACT, res.data[0]);
             }
-
         },
             err => {
                 if (err?.response?.data) {
@@ -35,6 +34,7 @@ class CardContacts extends Component {
         );
     }
     async search(e) {
+        ActionChatSocket.sendMessage(e.target.value)
         this.setState({ keyValue: e.target.value });
         if (e.target.value) {
             const obj = { keyValue: e.target.value, exceptId: Storage.getAccount()._id }
@@ -59,6 +59,11 @@ class CardContacts extends Component {
         this.props.changContactDispatch(CHANGE_CONTACT, item);
     }
     _renderContact = () => {
+
+        // socket.emit("demo1", { data: { name: 'aaa' } })
+        ActionChatSocket.socket.on("demo2", (data) => {
+            debugger
+        })
         const { accouts } = this.state;
         let resuft = accouts.length === 0 ? <li></li> : accouts.map((e, i) =>
             <li className={'contact_Li ' + (this.state.contactId === e._id ? 'active' : '')} key={i}

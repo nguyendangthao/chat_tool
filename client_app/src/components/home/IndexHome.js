@@ -4,8 +4,8 @@ import CardChat from './card_chat';
 import CardSend from './card_send';
 import CardChatInfor from './card_chat_infor';
 import CardChatOption from './card_chat_option';
-
 class IndexHome extends Component {
+
     render() {
         return (
 

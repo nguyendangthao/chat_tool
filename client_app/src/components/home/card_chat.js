@@ -24,7 +24,6 @@ class CardChat extends Component {
         this.getChannelDetail(newProps?.contact?._id);
     }
     async getChannelDetail(_id) {
-        debugger
         if (_id)
             await mainService.getChannelDetail(_id).then(res => {
                 if (res.status === 200) {

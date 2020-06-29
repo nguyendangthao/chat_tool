@@ -60,7 +60,7 @@ class ChannelController implements Controller {
             .post(this.path + '/uploadMulti', upload.array('avatar', 3), this.uploadMulti)
             .post(this.path + '/uploadFormidable', this.uploadFormidable)
 
-            .get(this.path + '/detail' + '/:_id', this.detail)
+            .get(this.path + '/detail' + '/:_id', authMiddleware, this.detail)
             .post(this.path + '/getChannels', authMiddleware, this.getChannels)
     }
     private getAll = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
