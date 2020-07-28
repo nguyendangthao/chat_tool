@@ -182,6 +182,7 @@
   bottom: -15px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 10px;
+  min-width: max-content;
 }
 .msg_time_send {
   position: absolute;
@@ -189,6 +190,7 @@
   bottom: -15px;
   color: rgba(255, 255, 255, 0.5);
   font-size: 10px;
+  min-width: max-content;
 }
 .msg_head {
   position: relative;
@@ -201,16 +203,22 @@
   cursor: pointer;
   font-size: 20px;
 }
+.status_menu {
+  left: 45px;
+  top: 65px !important;
+  right: auto !important;
+  padding: unset !important;
+}
 .action_menu {
   z-index: 1;
   position: absolute;
   padding: 15px 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgb(48 57 83);
   color: white;
   border-radius: 15px;
   top: 30px;
   right: 15px;
-  display: none;
+  /* display: none; */
 }
 .action_menu ul {
   list-style: none;
@@ -269,4 +277,18 @@
 
 .contacts_header {
   padding-left: 0.7rem;
+}
+
+.user_cont_none_msg {
+  height: 120px;
+  width: 120px;
+  border: 1.5px solid #f5f6fa;
+}
+.btnTypeSearch {
+  border: 1px solid #007bff !important;
+  padding: 2px !important;
+  border-radius: 25px !important;
+}
+.btnTypeSearchActive {
+  background-color: #0069d9;
 }

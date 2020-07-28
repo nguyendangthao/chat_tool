@@ -195,39 +195,21 @@ class ChannelService {
         let channel = await this.channel.aggregate([
             {
                 $match: {
-                    'members.user_id': mongoose.Types.ObjectId(body._id)
-                }
+                    'members.account_id': mongoose.Types.ObjectId(body._id),
+                    $or: [
+                        { name: { '$regex': body.keyValue, '$options': 'i' } },
+                        { 'members.account_name': { '$regex': body.keyValue, '$options': 'i' } },
+                    ]
+                },
             },
             {
                 $lookup:
                 {
                     from: 'Account',
-                    localField: 'members.user_id',
+                    localField: 'members.account_id',
                     foreignField: '_id',
                     as: 'Accounts'
                 }
-                // $lookup:
-                // {
-                //     from: 'Account',
-                //     let: { member_item: "$members.user_id", },
-                //     pipeline: [
-                //         {
-                //             $match:
-                //             {
-                //                 $expr:
-                //                 {
-                //                     $and:
-                //                         [
-                //                             { $eq: ["$_id", "$$member_item"] },
-                //                             { $ne: ["$_id", body._id] }
-                //                         ]
-                //                 }
-                //             }
-                //         },
-
-                //     ],
-                //     as: 'Accounts'
-                // }
             },
             {
                 $project:
@@ -257,14 +239,68 @@ class ChannelService {
             } else {
                 let acc = e.Accounts.find((x: any) => x._id.toString() !== body._id);
                 if (acc) {
-                    obj.avatar = acc.avatar;
                     obj.account_name = acc.account_name;
-                    obj.isOnline = true;
+                    obj.account_id = acc._id
+                    obj.avatar = acc.avatar;
+                    obj.isOnline = acc.isOnline;
                 }
             }
             result.push(obj)
         })
         return result;
     }
+
+    public async createChannel(req: any) {
+        let chanel = {
+            _id: mongoose.Types.ObjectId(),
+            name: req.name,
+            members: req.members,
+            messages: req.contact.messages,
+            avatar: req.contact.avatar,
+            isGroup: req.contact.isGroup,
+        };
+        if (!req.isGroup) {
+            chanel.members = [{
+                account_id: req.contact.account_id,
+                account_name: req.contact.account_name,
+            },
+            {
+                account_id: req.userSend._id,
+                account_name: req.userSend.account_name,
+            }
+            ]
+        }
+        await this.channel.create(chanel);
+        await chanel.members.forEach(async (item: any) => {
+            let ac = await this.account.findById(item.account_id);
+            await this.account.updateOne(
+                { _id: item.account_id },
+                {
+                    channels: ac.channels ? [...ac.channels, {
+                        channel_id: chanel._id,
+                        channel_name: chanel.name
+                    }] : [{
+                        channel_id: chanel._id,
+                        channel_name: chanel.name
+                    }]
+                });
+        });
+
+        return chanel;
+    }
+
+    public async addMessage(data: any) {
+        let result = await this.channel.updateOne({
+            _id: data._id
+        },
+            {
+                messages: data.messages
+            });
+        if (result.nModified < 1) {
+            return false;
+        }
+        return true;
+    }
 }
+
 export default ChannelService;

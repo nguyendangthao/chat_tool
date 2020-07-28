@@ -18,7 +18,9 @@ class MainService extends Http {
     async getChannelDetail(id) {
         return await this.axios.get(`/channel/detail/${id}`);
     }
-
+    async changeStatus(obj) {
+        return await this.axios.post(`/account/changeStatus`, obj);
+    }
 
 }
 

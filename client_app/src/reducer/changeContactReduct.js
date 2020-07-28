@@ -1,4 +1,4 @@
-import { CHANGE_CONTACT }
+import { CHANGE_CONTACT, SEND_MESSAGE }
     from '../constants/actionReduct';
 
 const INIT_STATE =
@@ -9,12 +9,16 @@ const INIT_STATE =
     isGroup: false,
     avatar: '',
     isOnline: null,
+    isNone: true
 };
 
 const changeContactReduct = (state = INIT_STATE, action) => {
     switch (action.type) {
         case CHANGE_CONTACT:
-            state = { ...action.contact };
+            state = { ...action.contact, isNone: false };
+            return state;
+        case SEND_MESSAGE:
+            state = { ...action.contact, };
             return state;
         default: return state;
     }

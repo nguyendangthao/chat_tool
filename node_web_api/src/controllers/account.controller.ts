@@ -53,14 +53,16 @@ class AccountController implements Controller {
             .post(this.path + '/create', validationMiddleware(AccountCreateVal), this.create)
             .post(this.path + '/update', authMiddleware, validationMiddleware(AccountUpdateVal), this.update)
             .post(this.path + '/changePassword', this.changePassword)
-            .post(this.path + '/find', authMiddleware, this.find)
             .post(this.path + '/forgetPassword', this.forgetPassword)
             .post(this.path + '/uploadAvatar', upload.single('avatar'), this.uploadAvatar)
             .get(this.path + '/getAvatar' + '/:avatar', this.getAvatar)
             .post(this.path + '/uploadMulti', upload.array('avatar', 3), this.uploadMulti)
             .post(this.path + '/uploadFormidable', this.uploadFormidable)
             .get(this.path + '/detail' + '/:_id', this.detail)
-       
+
+            .post(this.path + '/find', authMiddleware, this.find)
+            .post(this.path + '/changeStatus', authMiddleware, this.changeStatus)
+
     }
     private getAll = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
 
@@ -222,7 +224,18 @@ class AccountController implements Controller {
         // }
         return response.send(result);
     }
+    private changeStatus = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        try {
+            let result = await this.accountService.changeStatus(request);
+            response.send({
+                status: result,
+            });
 
-   
+        } catch (error) {
+            next(error);
+        }
+
+    }
+
 }
 export default AccountController;

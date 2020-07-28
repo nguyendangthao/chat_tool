@@ -5,7 +5,6 @@ export default class StreamSocket extends RootSocket {
         super()
         try {
             this.socket.on("demo", (data) => {
-                debugger
             })
         }
         catch (error) {

@@ -3,10 +3,10 @@ import { AccountInterface } from '../interfaces/account.interface';
 import AccountModel from '../models/account.model'
 import * as bcrypt from 'bcrypt';
 import HttpException from '../exceptions/httpException';
+import ContactView from '../models_view/contact.view';
 
 class AccountService {
     public account = AccountModel;
-
     public async create(req: AccountInterface) {
         if (await this.account.findOne({ account_name: req.account_name })) {
             throw new HttpException(500, `Account ${req.account_name} is exist.`);
@@ -134,6 +134,13 @@ class AccountService {
         }
     }
     public async find(req: any) {
+        const { channels } = await this.account.findById(req.exceptId)
+        let cn: any[] = [];
+        if (channels) {
+            channels.forEach((e: any) => {
+                cn.push(e.channel_id);
+            });
+        }
         let query: any = {}
         if (req.keyValue)
             query['$or'] = [
@@ -141,8 +148,21 @@ class AccountService {
                 { email: { '$regex': req.keyValue, '$options': 'i' } },
             ];
         query._id = { $ne: req.exceptId };
-        return await this.account.find(query);
+        query['channels.channel_id'] = { $nin: cn };
 
+        const account = await this.account.find(query);
+
+        let data = account.map(acc => {
+            let obj = new ContactView();
+            obj.account_name = acc.account_name;
+            obj.account_id = acc._id;
+            obj.avatar = acc.personal.avatar;
+            obj.isOnline = acc.isOnline;
+            obj.isGroup = false;
+            obj.messages = [];
+            return obj;
+        });
+        return data;
     }
     public async forgetPassword(req: any) {
         let acount: any = await this.account.findOne({
@@ -215,6 +235,16 @@ class AccountService {
             }
         ]);
         return result[0];
+    }
+    public async changeStatus(req: any) {
+        const result = await this.account.updateOne({
+            _id: req.account._id
+        },
+            {
+                isOnline: req.body.isOnline
+            });
+        return result.nModified > 0;
+
     }
 
 }

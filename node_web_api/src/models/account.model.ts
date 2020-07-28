@@ -16,7 +16,6 @@ const AccountSchema = new mongoose.Schema({
             channel_id: { type: mongoose.Schema.Types.ObjectId },
             channel_name: { type: String, },
         }
-
     ],
     created_at: { type: Date, default: new Date() },
     updated_at: { type: Date, default: new Date() },

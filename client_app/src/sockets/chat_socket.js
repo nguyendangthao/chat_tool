@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 import RootSocket from "./root_socket";
-
+import DispatchChatSocket from "../helpers/dispatch_chat_socket";
 // export const ChatSocket = () => {
 //     try {
 //     let socket = null;
@@ -21,11 +21,12 @@ import RootSocket from "./root_socket";
 // };
 
 export default class ChatSocket extends RootSocket {
+
     constructor() {
         super()
+        this.dispatch = new DispatchChatSocket();
         try {
-            this.socket.on("send_message_server", (data) => {
-            })
+            this.socket.on("send_message_server", data => this.dispatch.sendMessageServer(data || data.contact))
         }
         catch (error) {
             console.log(error)

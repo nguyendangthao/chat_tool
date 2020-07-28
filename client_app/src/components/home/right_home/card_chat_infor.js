@@ -1,6 +1,4 @@
 import React, { Component } from 'react';
-import mainService from '../../uitls/main_service';
-import Storage from '../../helpers/storage';
 import { connect } from 'react-redux';
 class CardChatInfor extends Component {
 
@@ -20,11 +18,12 @@ class CardChatInfor extends Component {
                 </div>
                 <div className="user_info">
                     <span>{this.props.contact.account_name}</span>
-                    <p>1767 Messages</p>
+                    <p>{this.props.contact?.messages?.length} Messages</p>
                 </div>
                 <div className="video_cam">
                     <span><i className="fas fa-video" /></span>
                     <span><i className="fas fa-phone" /></span>
+                    <span><i className="fas fa-user-plus" /></span>
                 </div>
             </div>
 

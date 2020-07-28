@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
-import CardContacts from './card_contacts';
-import CardChat from './card_chat';
-import CardSend from './card_send';
-import CardChatInfor from './card_chat_infor';
-import CardChatOption from './card_chat_option';
+import CardContacts from './left_home/card_contacts';
+import CardChat from './right_home/card_chat';
+import CardSend from './right_home/card_send';
+import CardChatInfor from './right_home/card_chat_infor';
+import CardChatOption from './right_home/card_chat_option';
+import { connect } from 'react-redux';
 class IndexHome extends Component {
 
     render() {
@@ -15,14 +16,14 @@ class IndexHome extends Component {
                     <div className="col-md-8 col-xl-6 chat">
                         <div className="card card-chat">
                             <div className="card-header msg_head">
-                                <CardChatInfor />
-                                <CardChatOption />
+                                {!this.props.contact.isNone && <CardChatInfor />}
+                                {!this.props.contact.isNone && <CardChatOption />}
                             </div>
-                            <div className="card-body msg_card_body">
-                                <CardChat />
-                            </div>
+                            {/* <div className="card-body msg_card_body"> */}
+                            <CardChat />
+                            {/* </div> */}
                             <div className="card-footer">
-                                <CardSend />
+                                {!this.props.contact.isNone && <CardSend />}
                             </div>
                         </div>
                     </div>
@@ -32,4 +33,18 @@ class IndexHome extends Component {
         );
     }
 }
-export default IndexHome
+
+function mapStateToProps(state) {
+    return {
+        contact: state.changeContactReduct,
+    };
+}
+const mapPropsToDispatch = dispatch => ({
+    changContactDispatch: (action, contact) => {
+        return dispatch({
+            type: action, contact
+        });
+    },
+});
+
+export default connect(mapStateToProps, mapPropsToDispatch)(IndexHome);
