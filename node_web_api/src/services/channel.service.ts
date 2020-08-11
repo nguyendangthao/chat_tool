@@ -169,23 +169,7 @@ class ChannelService {
         }
         return true;
     }
-    public async uploadAvatar(body: any) {
-        let exist = await this.channel.findById(body._id);
-        if (!exist) {
-            throw new HttpException(500, `Account is not exist.`);
-        }
-        const result = await this.channel.updateOne({
-            _id: mongoose.Types.ObjectId(body._id)
-        },
-            {
-                'personal.avatar': body.avatar,
 
-            });
-        if (result.nModified < 1) {
-            return false;
-        }
-        return true;
-    }
     public async detail(_id: string) {
         let result = await this.channel.findById(_id);
         return result;
@@ -233,15 +217,16 @@ class ChannelService {
             obj._id = e._id;
             obj.name = e.name;
             obj.messages = e.messages;
-            obj.isGroup = e.isGroup
+            obj.isGroup = e.isGroup;
             if (e.isGroup) {
                 obj.avatar = e.avatar;
+                obj.members = e.members;
             } else {
                 let acc = e.Accounts.find((x: any) => x._id.toString() !== body._id);
                 if (acc) {
                     obj.account_name = acc.account_name;
                     obj.account_id = acc._id
-                    obj.avatar = acc.avatar;
+                    obj.avatar = acc.personal.avatar;
                     obj.isOnline = acc.isOnline;
                 }
             }
@@ -295,6 +280,88 @@ class ChannelService {
         },
             {
                 messages: data.messages
+            });
+        if (result.nModified < 1) {
+            return false;
+        }
+        return true;
+    }
+    public async addGroupChannel(req: any) {
+        const members = req.account.map((e: any) => {
+            return {
+                account_id: e.account_id,
+                account_name: e.account_name,
+            }
+        });
+        const admin = {
+            account_id: req.admin._id,
+            account_name: req.admin.account_name,
+        };
+        let chanel = {
+            _id: mongoose.Types.ObjectId(),
+            isGroup: true,
+            members: [...members, admin],
+            name: req.admin.account_name + '...',
+            admin: admin
+        };
+        await this.channel.create(chanel);
+        await chanel.members.forEach(async (item: any) => {
+            let ac = await this.account.findById(item.account_id);
+            await this.account.updateOne(
+                { _id: item.account_id },
+                {
+                    channels: ac.channels ? [...ac.channels, {
+                        channel_id: chanel._id,
+                        channel_name: chanel.name
+                    }] : [{
+                        channel_id: chanel._id,
+                        channel_name: chanel.name
+                    }]
+                });
+        });
+        return chanel;
+    }
+    public async updateGroupChannel(req: any) {
+        const members = req.account.map((e: any) => {
+            return {
+                account_id: e.account_id,
+                account_name: e.account_name,
+            }
+        });
+        let ch = await this.channel.findById(req.chanel._id);
+        await this.channel.updateOne(
+            { _id: req.chanel._id },
+            {
+                members: [...ch.members, ...members]
+            });
+        await members.forEach(async (item: any) => {
+            let ac = await this.account.findById(item.account_id);
+            await this.account.updateOne(
+                { _id: item.account_id },
+                {
+                    channels: ac.channels ? [...ac.channels, {
+                        channel_id: req.chanel._id,
+                        channel_name: req.chanel.name
+                    }] : [{
+                        channel_id: req.chanel._id,
+                        channel_name: req.chanel.name
+                    }]
+                });
+        });
+        return ch;
+    }
+
+    public async uploadAvatar(body: any) {
+        let exist = await this.channel.findById(body._id);
+        if (!exist) {
+            throw new HttpException(500, `Channel is not exist.`);
+        }
+        const result = await this.channel.updateOne({
+            _id: mongoose.Types.ObjectId(body._id)
+        },
+            {
+                'avatar': body.avatar,
+
             });
         if (result.nModified < 1) {
             return false;

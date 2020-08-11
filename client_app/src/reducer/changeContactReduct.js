@@ -1,4 +1,4 @@
-import { CHANGE_CONTACT, SEND_MESSAGE }
+import { CHANGE_CONTACT, SEND_MESSAGE, ADD_GROUP }
     from '../constants/actionReduct';
 
 const INIT_STATE =
@@ -9,7 +9,8 @@ const INIT_STATE =
     isGroup: false,
     avatar: '',
     isOnline: null,
-    isNone: true
+    isNone: true,
+    avatar: ''
 };
 
 const changeContactReduct = (state = INIT_STATE, action) => {

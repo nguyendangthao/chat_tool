@@ -20,5 +20,8 @@ class Storage {
     localStorage.removeItem('account');
     localStorage.removeItem('token');
   }
+  updateAccount(account) {
+    this.setAccount(account);
+  }
 }
 export default new Storage();

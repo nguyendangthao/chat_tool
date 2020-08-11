@@ -16,8 +16,8 @@ class AuthenService {
             const isPasswordMatching = await bcrypt.compare(req.password, acc.password);
             if (!isPasswordMatching)
                 throw new HttpException(500, `Password is not correct.`);
-            if (acc.lock)
-                throw new HttpException(500, `Email ${req.email} is lock.`);
+            // if (acc.lock)
+            //     throw new HttpException(500, `Email ${req.email} is lock.`);
             await this.account.updateOne({
                 _id: acc._id
             },

@@ -23,5 +23,6 @@ export default class ContactView {
     isGroup = false;
     created_at: string;
     isOnline = false;
+    members: any[];
 }
 

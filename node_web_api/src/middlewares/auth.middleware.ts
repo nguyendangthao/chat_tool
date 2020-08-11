@@ -15,7 +15,7 @@ async function authMiddleware(request: RequestWithUser, response: Response, next
         }
         if (decoded) {
           const account = await accountModel.findById(decoded._id);
-          if (account && !account.lock) {
+          if (account) {
             account.password = undefined;
             request.account = account;
             next();

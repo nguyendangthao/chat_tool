@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import Storage from '../../../helpers/storage';
 import { connect } from 'react-redux';
+import mainService from '../../../uitls/main_service';
 
 class CardChat extends Component {
 
@@ -8,6 +9,7 @@ class CardChat extends Component {
         super(props)
         this.state = {
             contact: props.contact,
+            avatarUrl: 'https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg'
         }
         this.myRef = React.createRef();
     }
@@ -19,7 +21,10 @@ class CardChat extends Component {
         //this.getChannelDetail(_id);
     }
     componentDidMount() {
-
+        if (Storage.getAccount().personal.avatar) {
+            this.setState({ avatarUrl: mainService.getAvatar(Storage.getAccount().personal.avatar) })
+        }
+        document.addEventListener('mousedown', this.handleClickOutsideStatus);
     }
     async componentWillReceiveProps(newProps) {
         this.setState({ contact: newProps.contact });
@@ -50,7 +55,7 @@ class CardChat extends Component {
                 </div>
             </div>
         } else {
-            return this.state.contact?.messages.map((e, i) => {
+            return this.state.contact?.messages?.map((e, i) => {
                 const date = new Date(e?.time);
                 if (e.account_id !== profilet_id) {
                     return <div className="d-flex justify-content-start mb-4" key={i}>
@@ -79,7 +84,7 @@ class CardChat extends Component {
     _rendNoneContact() {
         return <div className="row" style={{ textAlign: 'center' }}>
             <div className="col-md-12" style={{ paddingBottom: '2rem' }}>
-                <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" className="rounded-circle user_cont_none_msg" />
+                <img src={this.state.avatarUrl} className="rounded-circle user_cont_none_msg" />
             </div>
             <div className="col-md-12 msg_cotainer_send">
                 <h3>  Welcome {Storage.getAccount().account_name}</h3>

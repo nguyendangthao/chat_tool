@@ -21,6 +21,14 @@ class CardContacts extends Component {
     async componentWillMount() {
         await this.getChannels();
     }
+    componentWillReceiveProps(newProps) {
+        if (newProps.newContact._id !== this.props.newContact._id) {
+            const { accounts } = this.state;
+            accounts.unshift(newProps.newContact);
+            this.setState({ accounts, contactId: newProps.newContact._id });
+            this.props.changContactDispatch(CHANGE_CONTACT, newProps.newContact);
+        }
+    }
     async getChannels() {
         const obj = { _id: Storage.getAccount()._id, keyValue: this.state.keyValue }
         await mainService.getChannels(obj).then(res => {
@@ -72,6 +80,12 @@ class CardContacts extends Component {
         } else
             await this.getChannels();
     }
+    getAvatar = (e) => {
+        if (e.avatar) {
+            return mainService.getAvatar(e.avatar);
+        }
+        return 'https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg';
+    }
     _renderContact = () => {
         const { accounts } = this.state;
         let resuft = accounts.length === 0 ? <li></li> : accounts.map((e, i) =>
@@ -79,7 +93,7 @@ class CardContacts extends Component {
                 onClick={(event) => this.selectContact(event, e, i)}>
                 <div className="d-flex bd-highlight">
                     <div className="img_cont">
-                        <img src="https://static.turbosquid.com/Preview/001292/481/WV/_D.jpg" className="rounded-circle user_img" />
+                        <img src={this.getAvatar(e)} className="rounded-circle user_img" />
                         {!e.isGroup && <span className={e.isOnline ? 'online_icon' : 'away_icon'} />}
                     </div>
                     <div className="user_info">
@@ -131,5 +145,10 @@ const mapPropsToDispatch = dispatch => ({
         });
     },
 });
+function mapStateToProps(state) {
+    return {
+        newContact: state.addGroupReduct,
+    };
+}
 
-export default connect(null, mapPropsToDispatch)(CardContacts);
+export default connect(mapStateToProps, mapPropsToDispatch)(CardContacts);

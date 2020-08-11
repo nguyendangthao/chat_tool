@@ -15,6 +15,18 @@ export default class ChatSocket {
                         io.emit("send_message_server", result)
                     }
                 })
+                socket.on("add_group_client", async (data: any) => {
+                    var result = await this.chatSocketHelper.add_group_client(data);
+                    if (result) {
+                        io.emit("add_group_server", result)
+                    }
+                })
+                socket.on("update_group_client", async (data: any) => {
+                    var result = await this.chatSocketHelper.update_group_client(data);
+                    if (result) {
+                        io.emit("update_group_server", result)
+                    }
+                })
             } catch (error) {
                 console.log(error)
             }

@@ -16,4 +16,10 @@ export default class ChatSocketHelper {
                 return data.contact;
         }
     }
+    async add_group_client(data: any) {
+        return await this.channelService.addGroupChannel(data)
+    }
+    async update_group_client(data: any) {
+        return await this.channelService.updateGroupChannel(data)
+    }
 }

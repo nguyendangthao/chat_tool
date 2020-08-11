@@ -62,6 +62,7 @@ class ChannelController implements Controller {
 
             .get(this.path + '/detail' + '/:_id', authMiddleware, this.detail)
             .post(this.path + '/getChannels', authMiddleware, this.getChannels)
+            .post(this.path + '/uploadAvatar', upload.single('avatar'), this.uploadAvatar)
     }
     private getAll = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
 
@@ -140,27 +141,7 @@ class ChannelController implements Controller {
             return next(er);
         }
     }
-    private uploadAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        try {
-            if (!request.file) {
-                return response.send("don't have file");
-            }
-            if (!this.objectId.isValid(request.body._id)) {
-                next(new HttpException(500, `Don't have Account change`));
-            }
-            const objAccount: any = {
-                _id: request.body._id,
-                avatar: request.file.filename
-            }
-            const result = await this.channelService.uploadAvatar(objAccount);
-            if (!result) {
-                next(new HttpException(500, 'Fall'));
-            }
-            return response.send({ "avatar": request.file.filename });
-        } catch (er) {
-            return next(er);
-        }
-    }
+
     private getAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         const avatar = request.params.avatar;
         return response.sendFile(process.cwd() + '/src/uploads/images/' + avatar, (error) => {
@@ -213,6 +194,27 @@ class ChannelController implements Controller {
         try {
             let data = await this.channelService.getChannels(request.body)
             return response.send(data);
+        } catch (er) {
+            return next(er);
+        }
+    }
+    private uploadAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        try {
+            if (!request.file) {
+                return response.send("don't have file");
+            }
+            if (!this.objectId.isValid(request.body._id)) {
+                next(new HttpException(500, `Don't have Channel change`));
+            }
+            const objAccount: any = {
+                _id: request.body._id,
+                avatar: request.file.filename
+            }
+            const result = await this.channelService.uploadAvatar(objAccount);
+            if (!result) {
+                next(new HttpException(500, 'Fall'));
+            }
+            return response.send({ "avatar": request.file.filename });
         } catch (er) {
             return next(er);
         }

@@ -51,17 +51,18 @@ class AccountController implements Controller {
         this.router
             .post(this.path + '/getAll', authMiddleware, this.getAll)
             .post(this.path + '/create', validationMiddleware(AccountCreateVal), this.create)
-            .post(this.path + '/update', authMiddleware, validationMiddleware(AccountUpdateVal), this.update)
-            .post(this.path + '/changePassword', this.changePassword)
             .post(this.path + '/forgetPassword', this.forgetPassword)
-            .post(this.path + '/uploadAvatar', upload.single('avatar'), this.uploadAvatar)
-            .get(this.path + '/getAvatar' + '/:avatar', this.getAvatar)
             .post(this.path + '/uploadMulti', upload.array('avatar', 3), this.uploadMulti)
             .post(this.path + '/uploadFormidable', this.uploadFormidable)
             .get(this.path + '/detail' + '/:_id', this.detail)
 
             .post(this.path + '/find', authMiddleware, this.find)
             .post(this.path + '/changeStatus', authMiddleware, this.changeStatus)
+            .post(this.path + '/findAccountFriend', authMiddleware, this.findAccountFriend)
+            .post(this.path + '/update', authMiddleware, this.update)
+            .post(this.path + '/changePassword', authMiddleware, this.changePassword)
+            .post(this.path + '/uploadAvatar', upload.single('avatar'), this.uploadAvatar)
+            .get(this.path + '/getAvatar' + '/:avatar', this.getAvatar)
 
     }
     private getAll = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -89,43 +90,7 @@ class AccountController implements Controller {
         }
 
     }
-    private update = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        try {
-            let result = await this.accountService.update(request.body);
-            response.send({
-                status: result,
-            });
 
-        } catch (error) {
-            next(error);
-        }
-
-    }
-    private changePassword = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        try {
-            let email = await this.accountService.changePassword(request.body);
-            if (email) {
-                await SendEmailHelper(email, 'Change PassWord', Email_Recovey_Password, ``);
-            }
-            response.send({
-                status: true,
-            });
-        } catch (error) {
-            next(error);
-        }
-
-    }
-    private find = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-
-        let data = await this.accountService.find(request.body);
-        if (!data) {
-            return false;
-        }
-        // response.send({
-        //     data: data,
-        // });
-        response.send(data);
-    }
     private forgetPassword = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
             let data = await this.accountService.forgetPassword(request.body);
@@ -140,34 +105,7 @@ class AccountController implements Controller {
             return next(er);
         }
     }
-    private uploadAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        try {
-            if (!request.file) {
-                return response.send("don't have file");
-            }
-            if (!this.objectId.isValid(request.body._id)) {
-                next(new HttpException(500, `Don't have Account change`));
-            }
-            const objAccount: any = {
-                _id: request.body._id,
-                avatar: request.file.filename
-            }
-            const result = await this.accountService.uploadAvatar(objAccount);
-            if (!result) {
-                next(new HttpException(500, 'Fall'));
-            }
-            return response.send({ "avatar": request.file.filename });
-        } catch (er) {
-            return next(er);
-        }
-    }
-    private getAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-        const avatar = request.params.avatar;
-        return response.sendFile(process.cwd() + '/src/uploads/images/' + avatar, (error) => {
-            if (error)
-                response.send(error.message);
-        });
-    }
+
     private uploadMulti = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
             if (!request.files) {
@@ -224,6 +162,18 @@ class AccountController implements Controller {
         // }
         return response.send(result);
     }
+
+    private find = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+
+        let data = await this.accountService.find(request.body);
+        if (!data) {
+            return false;
+        }
+        // response.send({
+        //     data: data,
+        // });
+        response.send(data);
+    }
     private changeStatus = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
             let result = await this.accountService.changeStatus(request);
@@ -236,6 +186,67 @@ class AccountController implements Controller {
         }
 
     }
+    private findAccountFriend = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        let data = await this.accountService.findAccountFriend(request);
+        if (!data) {
+            return false;
+        }
+        response.send(data);
+    }
+    private update = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        try {
+            let result = await this.accountService.update(request.body);
+            response.send({
+                status: result,
+            });
 
+        } catch (error) {
+            next(error);
+        }
+
+    }
+
+    private changePassword = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        try {
+            let email = await this.accountService.changePassword(request);
+            if (email) {
+                //  await SendEmailHelper(email, 'Change PassWord', Email_Recovey_Password, ``);
+            }
+            response.send({
+                status: true,
+            });
+        } catch (error) {
+            next(error);
+        }
+
+    }
+    private uploadAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        try {
+            if (!request.file) {
+                return response.send("don't have file");
+            }
+            if (!this.objectId.isValid(request.body._id)) {
+                next(new HttpException(500, `Don't have Account change`));
+            }
+            const objAccount: any = {
+                _id: request.body._id,
+                avatar: request.file.filename
+            }
+            const result = await this.accountService.uploadAvatar(objAccount);
+            if (!result) {
+                next(new HttpException(500, 'Fall'));
+            }
+            return response.send({ "avatar": request.file.filename });
+        } catch (er) {
+            return next(er);
+        }
+    }
+    private getAvatar = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+        const avatar = request.params.avatar;
+        return response.sendFile(process.cwd() + '/src/uploads/images/' + avatar, (error) => {
+            if (error)
+                response.send(error.message);
+        });
+    }
 }
 export default AccountController;

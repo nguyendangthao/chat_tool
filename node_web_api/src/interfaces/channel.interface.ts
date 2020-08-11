@@ -1,10 +1,7 @@
 export interface IChannel {
     _id: string;
     name: string,
-    members: [{
-        account_id: string,
-        account_name: string
-    }],
+    members:object[],
     messages: [
         {
             account_id: string,

@@ -26,7 +26,8 @@ export default class ChatSocket extends RootSocket {
         super()
         this.dispatch = new DispatchChatSocket();
         try {
-            this.socket.on("send_message_server", data => this.dispatch.sendMessageServer(data || data.contact))
+            this.socket.on("send_message_server", data => this.dispatch.sendMessageServer(data || data.contact));
+            this.socket.on("add_group_server", data => this.dispatch.addGroupServer(data))
         }
         catch (error) {
             console.log(error)

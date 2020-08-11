@@ -4,6 +4,7 @@ import storage from './storage';
 export default class Http {
   constructor() {
     this.axios = axios;
+    this.basedUrl = basedUrl;
   }
 
   async init() {
