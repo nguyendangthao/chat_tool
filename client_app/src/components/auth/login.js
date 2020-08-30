@@ -6,6 +6,7 @@ import authService from '../../uitls/auth_service';
 import Http from '../../helpers/http';
 import storage from '../../helpers/storage';
 import AlertPanel from '../../share/alert_panel';
+import authHelper from '../../helpers/auth';
 
 class Login extends Component {
     constructor(props) {
@@ -56,11 +57,14 @@ class Login extends Component {
             let { fields } = this.state;
             // let data = await authService.login(fields);  // one in two away get data
             await authService.login(fields).then(res => {
-                const { token, account } = res.data;
+                const { token, account, tokenRefresh,expiresIn } = res.data;
                 new Http().setAuthorizationHeader(token);
                 storage.setToken(token);
+                storage.setTokenRefresh(tokenRefresh);
                 storage.setAccount(account);
-                this.props.history.push('/')
+                storage.setExpiresIn(expiresIn);
+                authHelper.getTokenbyRefresh();
+                this.props.history.push('/');
             },
                 err => {
                     if (err.response.data) {

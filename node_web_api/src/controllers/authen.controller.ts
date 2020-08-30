@@ -18,6 +18,7 @@ class AuthenController implements Controller {
         this.router
             .post(this.path + '/login', validationMiddleware(LogInVal), this.login)
             .post(this.path + '/logout', validationMiddleware(LogInVal), this.logout)
+            .post(this.path + '/refreshToken', this.refreshToken)
     }
     private login = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
 
@@ -25,7 +26,13 @@ class AuthenController implements Controller {
             let acc = await this.autheService.login(request.body);
             if (acc) {
                 let tokenData = (new AuthenHelper()).createToken(acc);
-                response.send({ "token": tokenData.token, "account": acc });
+                let tokenRefreshData = (new AuthenHelper()).createRereshToken(acc);
+                response.send({
+                    "token": tokenData.token,
+                    "tokenRefresh": tokenRefreshData.token,
+                    "account": acc,
+                    "expiresIn":tokenData.expiresIn
+                });
             }
         }
         catch (err) {
@@ -38,6 +45,25 @@ class AuthenController implements Controller {
         response.send({
             status: data,
         });
+    }
+    private refreshToken = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+
+        try {
+            let acc = await this.autheService.refreshToken(request.body);
+            if (acc) {
+                let tokenData = (new AuthenHelper()).createToken(acc);
+                let tokenRefreshData = (new AuthenHelper()).createRereshToken(acc);
+                response.send({
+                    "token": tokenData.token,
+                    "tokenRefresh": tokenRefreshData.token,
+                    "expiresIn":tokenData.expiresIn
+                });
+            }
+        }
+        catch (err) {
+            next(err);
+        }
+
     }
 }
 export default AuthenController;

@@ -3,7 +3,8 @@ import * as express from 'express';
 import AccountModel from '../models/account.model';
 import HttpException from '../exceptions/httpException';
 import * as bcrypt from 'bcrypt';
-
+import * as jwt from 'jsonwebtoken';
+import { DataStoredInToken } from 'interfaces/authen.interface';
 class AuthenService {
     public account = AccountModel;
 
@@ -33,6 +34,21 @@ class AuthenService {
 
     public async logout(req: any) {
 
+    }
+    public async refreshToken(req: any) {
+        const token = req.tokenRefresh;
+        if (token) {
+            const secret = process.env.JWT_REFRESH_SECRET;
+            try {
+                var decoded: any = jwt.verify(token, secret);
+                const account = await this.account.findById(decoded._id);
+                return account;
+            } catch (err) {
+                throw new HttpException(401, err.message);
+            }
+        } else {
+            throw new HttpException(401, 'Authentication token missing');
+        }
     }
 }
 export default AuthenService;

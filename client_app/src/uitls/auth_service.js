@@ -18,6 +18,9 @@ class AuthService extends Http {
     async forgetPassword(obj) {
         return await this.axios.post(`/account/forgetPassword`, obj);
     }
+    async tokenRefresh(obj) {
+        return await this.axios.post(`/auth/refreshToken`, obj);
+    }
 
     // //#region  Category
     // async getByIdCategory(id) {
