@@ -29,7 +29,7 @@ class Authhelper {
         const timeExp = miliexp + timeNow;
         const dateExp = new Date(timeExp);
         return {
-            miliexp:2000, dateExp
+            miliexp, dateExp
         }
     }
 }

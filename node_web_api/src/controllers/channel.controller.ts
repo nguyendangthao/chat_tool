@@ -13,6 +13,9 @@ import * as multer from "multer";
 import * as formidable from 'formidable';
 let fs = require('fs');
 import { tempEmailCreateNewAcc, tempEmailReCoveryPass } from '../utils/temeplateEmail';
+import * as redis from 'redis';
+const reds = redis.createClient();
+
 const upload = multer({
     dest: 'uploads/',
     fileFilter: (req, file, cb) => {
@@ -192,8 +195,58 @@ class ChannelController implements Controller {
     }
     private getChannels = async (request: express.Request, response: express.Response, next: express.NextFunction) => {
         try {
-            let data = await this.channelService.getChannels(request.body)
-            return response.send(data);
+            reds.hmget('ch', ['name', 'age', 'addr', 'phone'], async (err, result) => {
+                if (err) {
+
+                }
+                if (result) {
+
+                }
+            });
+            reds.hgetall("ch", function (err, object) {
+                console.log(object);
+            });
+
+            reds.rpush('rpush', ['vegetable', 'carrot', 'celery','apple'], function (err, reply) {
+                console.log(reply);
+            });
+
+            reds.lrange("rpush", 2, 1, function (err, reply) {
+                console.log(reply);
+            });
+            reds.get('channel', async (err, result) => {
+                if (err) {
+                    return next(err);
+                }
+                if (result) {
+                    let data = JSON.parse(result);
+                    reds.hmset('ch', [
+                        'name', 'van A',
+                        'age', 12,
+                        'addr', 'HN',
+                        'phone', 1212121212,
+                    ], (err, r1) => {
+                        if (err) {
+                            return next(err);
+                        }
+                        if (r1) {
+                        }
+                    });
+
+
+                    return response.send(data);
+                }
+                if (!result) {
+                    let data = await this.channelService.getChannels(request.body)
+                    reds.set('channel', JSON.stringify(data));
+                    return response.send(data);
+                }
+            });
+
+            // original
+            // let data = await this.channelService.getChannels(request.body)
+            // return response.send(data);
+
         } catch (er) {
             return next(er);
         }
